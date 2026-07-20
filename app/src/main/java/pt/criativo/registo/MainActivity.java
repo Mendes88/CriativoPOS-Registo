@@ -9,11 +9,12 @@ import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.content.SharedPreferences;
 
 public class MainActivity extends Activity {
 
-    private WebView        webView;
-    private FirebaseBridge firebaseBridge;
+    private WebView  webView;
+    private BridgeLocal bridge;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -34,10 +35,9 @@ public class MainActivity extends Activity {
         ws.setDomStorageEnabled(true);
         ws.setAllowFileAccessFromFileURLs(true);
         ws.setAllowUniversalAccessFromFileURLs(true);
-        ws.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        firebaseBridge = new FirebaseBridge(this, webView);
-        webView.addJavascriptInterface(firebaseBridge, "AndroidFB");
+        bridge = new BridgeLocal(this, webView);
+        webView.addJavascriptInterface(bridge, "AndroidLocal");
 
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl("file:///android_asset/index.html");
@@ -56,22 +56,14 @@ public class MainActivity extends Activity {
         }
     }
 
-    @Override
-    public void onBackPressed() {}
+    @Override public void onBackPressed() {}
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        esconderBarras();
-    }
+    protected void onResume() { super.onResume(); esconderBarras(); }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (firebaseBridge != null) firebaseBridge.destroy();
-        if (webView != null) {
-            webView.removeAllViews();
-            webView.destroy();
-        }
+        if (webView != null) { webView.removeAllViews(); webView.destroy(); }
     }
 }
