@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Criativo Registo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--ac:#EF9F27;--bg:#1a1a1a;--sf:#242424;--bd:#2e2e2e;--tx:#f0f0f0;--di:#666;--gn:#4caf50;--rd:#c62828}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPO */
+.top-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-bottom:1px solid var(--bd);flex-shrink:0}
+.top-logo{font-size:20px;font-weight:800;color:var(--ac);letter-spacing:1px}
+.top-num{font-size:28px;font-weight:900;color:var(--ac);margin-left:auto}
+.top-total{font-size:18px;font-weight:700;color:var(--gn)}
+.btn-top{padding:8px 14px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:system-ui}
+.btn-cobrar{background:var(--ac);color:#111}
+.btn-limpar{background:var(--sf);color:var(--di);border:1px solid var(--bd)}
+
+/* LAYOUT PRINCIPAL */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* MENU */
+.menu-col{width:60%;border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.cats-bar{display:flex;gap:6px;padding:10px;overflow-x:auto;flex-shrink:0;background:#111;border-bottom:1px solid var(--bd)}
+.cats-bar::-webkit-scrollbar{height:3px}
+.cat-btn{padding:8px 16px;border:none;border-radius:20px;background:var(--sf);color:var(--di);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid var(--bd)}
+.cat-btn.on{background:var(--ac);color:#111;border-color:var(--ac)}
+.items-grid{flex:1;overflow-y:auto;padding:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;align-content:start}
+.items-grid::-webkit-scrollbar{width:3px}
+.item-btn{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px}
+.item-btn:active{background:#333}
+.item-nome{font-size:14px;font-weight:600;color:var(--tx)}
+.item-preco{font-size:13px;color:var(--ac);font-weight:700}
+.item-dest{font-size:10px;color:var(--di)}
+
+/* CARRINHO */
+.cart-col{width:40%;display:flex;flex-direction:column;overflow:hidden}
+.cart-lista{flex:1;overflow-y:auto;padding:8px}
+.cart-lista::-webkit-scrollbar{width:3px}
+.cart-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--sf);border-radius:8px;margin-bottom:6px;border:1px solid var(--bd)}
+.ci-nome{flex:1;font-size:13px;font-weight:500}
+.ci-qtd-wrap{display:flex;align-items:center;gap:6px}
+.ci-btn{width:28px;height:28px;border:none;border-radius:6px;background:#333;color:var(--tx);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ci-qtd{font-size:14px;font-weight:700;min-width:20px;text-align:center}
+.ci-sub{font-size:12px;color:var(--ac);font-weight:700;min-width:50px;text-align:right}
+.cart-empty{text-align:center;padding:40px;color:var(--di);font-size:14px}
+.cart-footer{padding:12px;border-top:1px solid var(--bd);background:#111;flex-shrink:0}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.total-lbl{font-size:14px;color:var(--di)}
+.total-val{font-size:22px;font-weight:800;color:var(--gn)}
+.btn-pagar{width:100%;padding:16px;background:var(--ac);border:none;border-radius:12px;color:#111;font-size:18px;font-weight:800;cursor:pointer;font-family:system-ui}
+.btn-pagar:disabled{background:#333;color:var(--di)}
+
+/* MODAL PAGAMENTO */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:999}
+.modal-box{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);width:92%;max-width:420px;background:#1e1e1e;border-radius:16px;padding:24px;border:1px solid var(--bd)}
+.modal-titulo{font-size:20px;font-weight:800;color:var(--tx);margin-bottom:16px}
+.modal-num{font-size:72px;font-weight:900;color:var(--ac);text-align:center;margin:16px 0}
+.modal-total{font-size:18px;color:var(--gn);text-align:center;font-weight:700;margin-bottom:20px}
+.modal-btns{display:flex;gap:10px}
+.btn-imprimir{flex:2;padding:14px;background:var(--ac);border:none;border-radius:10px;color:#111;font-size:16px;font-weight:800;cursor:pointer}
+.btn-cancelar{flex:1;padding:14px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;color:var(--di);font-size:14px;cursor:pointer}
+
+/* METODO PAGAMENTO */
+.pag-opts{display:flex;gap:8px;margin-bottom:16px}
+.pag-opt{flex:1;padding:12px;border:2px solid var(--bd);border-radius:10px;background:var(--sf);color:var(--di);font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+.pag-opt.on{border-color:var(--ac);color:var(--ac);background:#2a1f0a}
+
+/* CONFIG */
+.btn-cfg{position:fixed;bottom:16px;right:16px;width:44px;height:44px;background:var(--sf);border:1px solid var(--bd);border-radius:50%;color:var(--di);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100}
+</style>
+</head>
+<body>
+
+<!-- TOPO -->
+<div class="top-bar">
+  <div class="top-logo">&#127859; Criativo Registo</div>
+  <div class="top-total" id="top-total">0,00 €</div>
+  <button class="btn-top btn-limpar" onclick="limparCarrinho()">&#10005; Limpar</button>
+  <button class="btn-top btn-cobrar" onclick="abrirPagamento()" id="btn-cobrar" disabled>Cobrar</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- MENU -->
+  <div class="menu-col">
+    <div class="cats-bar" id="cats-bar"></div>
+    <div class="items-grid" id="items-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--di)">A carregar menu...</div>
+    </div>
+  </div>
+
+  <!-- CARRINHO -->
+  <div class="cart-col">
+    <div class="cart-lista" id="cart-lista">
+      <div class="cart-empty">Sem artigos</div>
+    </div>
+    <div class="cart-footer">
+      <div class="total-row">
+        <span class="total-lbl">Total</span>
+        <span class="total-val" id="total-val">0,00 €</span>
+      </div>
+      <button class="btn-pagar" id="btn-pagar" onclick="abrirPagamento()" disabled>
+        &#128179; Cobrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAGAMENTO -->
+<div class="modal-overlay" id="modal-pag">
+  <div class="modal-box">
+    <div class="modal-titulo">&#128179; Pagamento</div>
+    <div class="pag-opts">
+      <div class="pag-opt on" onclick="selPag(this,'d')">&#128181; Dinheiro</div>
+      <div class="pag-opt" onclick="selPag(this,'c')">&#128179; Cartao</div>
+      <div class="pag-opt" onclick="selPag(this,'m')">&#128247; MB Way</div>
+    </div>
+    <div id="pag-total" style="font-size:24px;font-weight:800;color:var(--gn);text-align:center;margin-bottom:20px">0,00 €</div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-imprimir" onclick="confirmarPagamento()">&#10003; Confirmar e Imprimir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SENHA -->
+<div class="modal-overlay" id="modal-senha">
+  <div class="modal-box" style="text-align:center">
+    <div style="font-size:16px;color:var(--di);margin-bottom:8px">Senha gerada</div>
+    <div class="modal-num" id="senha-num">--</div>
+    <div class="modal-total" id="senha-total">0,00 €</div>
+    <div style="font-size:13px;color:var(--di);margin-bottom:20px">A imprimir taloes...</div>
+    <div class="modal-btns">
+      <button class="btn-imprimir" onclick="novoRegisto()">&#10003; Novo Registo</button>
+    </div>
+  </div>
+</div>
+
+<button class="btn-cfg" onclick="abrirConfig()" title="Configuracoes">&#9881;</button>
+
+<script>
+var cart = [];
+var menu = [];
+var catActual = null;
+var pagMetodo = 'd';
+var numSenha = 0;
+
+// =================== INICIALIZAÇÃO ===================
+(function(){
+  if(typeof AndroidFB !== 'undefined'){
+    try{ AndroidFB.carregarMenu(); }catch(e){}
+  } else {
+    // Modo demo sem Android
+    window.dispatchEvent(new CustomEvent('fbMenuCarregado', {detail: JSON.stringify([
+      {id:'c1', nome:'Comidas', ordem:0, items:[
+        {nome:'Bifana no pão', preco:4, destino:'cozinha'},
+        {nome:'Prego no pão', preco:6, destino:'cozinha'},
+        {nome:'Leitão', preco:18, destino:'cozinha'}
+      ]},
+      {id:'c2', nome:'Bebidas', ordem:1, items:[
+        {nome:'Cerveja', preco:1.5, destino:'bar'},
+        {nome:'Água', preco:1, destino:'bar'},
+        {nome:'Refrigerante', preco:1.6, destino:'bar'}
+      ]}
+    ])}));
+  }
+})();
+
+// =================== MENU ===================
+window.addEventListener('fbMenuCarregado', function(e){
+  try{
+    menu = JSON.parse(e.detail||'[]');
+    menu.sort(function(a,b){return (a.ordem||0)-(b.ordem||0);});
+    renderCats();
+    if(menu.length) selCat(menu[0].id);
+  }catch(ex){}
+});
+
+function renderCats(){
+  var bar = document.getElementById('cats-bar');
+  bar.innerHTML = menu.map(function(c){
+    return '<button class="cat-btn" data-id="'+c.id+'" onclick="selCat(\''+c.id+'\')">'+esc(c.nome)+'</button>';
+  }).join('');
+}
+
+function selCat(id){
+  catActual = id;
+  document.querySelectorAll('.cat-btn').forEach(function(b){
+    b.className = 'cat-btn' + (b.dataset.id === id ? ' on' : '');
+  });
+  var cat = menu.find(function(c){return c.id===id;});
+  var grid = document.getElementById('items-grid');
+  if(!cat || !cat.items || !cat.items.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--di)">Sem artigos</div>';
+    return;
+  }
+  grid.innerHTML = cat.items.map(function(it){
+    var qtd = cart.filter(function(c){return c.nome===it.nome;}).reduce(function(s,c){return s+c.q;},0);
+    var badge = qtd > 0 ? '<span style="float:right;background:var(--ac);color:#111;border-radius:10px;padding:1px 7px;font-size:12px;font-weight:800;">'+qtd+'</span>' : '';
+    return '<button class="item-btn" onclick="addItem(\''+escJs(it.nome)+'\','+it.preco+',\''+it.destino+'\')">'+
+      '<div class="item-nome">'+esc(it.nome)+badge+'</div>'+
+      '<div class="item-preco">'+EUR(it.preco)+' un.</div>'+
+      '<div class="item-dest">'+it.destino+'</div>'+
+    '</button>';
+  }).join('');
+}
+
+// =================== CARRINHO ===================
+function addItem(nome, preco, destino){
+  var ex = cart.find(function(c){return c.nome===nome;});
+  if(ex) ex.q++;
+  else cart.push({nome:nome, p:preco, q:1, d:destino});
+  renderCart();
+  if(catActual) selCat(catActual);
+}
+
+function removeItem(nome){
+  var ex = cart.find(function(c){return c.nome===nome;});
+  if(!ex) return;
+  ex.q--;
+  if(ex.q <= 0) cart = cart.filter(function(c){return c.nome!==nome;});
+  renderCart();
+  if(catActual) selCat(catActual);
+}
+
+function limparCarrinho(){
+  cart = [];
+  renderCart();
+  if(catActual) selCat(catActual);
+}
+
+function renderCart(){
+  var lista = document.getElementById('cart-lista');
+  if(!cart.length){
+    lista.innerHTML = '<div class="cart-empty">Sem artigos</div>';
+  } else {
+    lista.innerHTML = cart.map(function(it){
+      var sub = it.p * it.q;
+      return '<div class="cart-item">'+
+        '<div class="ci-nome">'+esc(it.nome)+'</div>'+
+        '<div class="ci-qtd-wrap">'+
+          '<button class="ci-btn" onclick="removeItem(\''+escJs(it.nome)+'\')">&#8722;</button>'+
+          '<span class="ci-qtd">'+it.q+'</span>'+
+          '<button class="ci-btn" onclick="addItem(\''+escJs(it.nome)+'\','+it.p+',\''+it.d+'\')">+</button>'+
+        '</div>'+
+        '<span class="ci-sub">'+EUR(sub)+'</span>'+
+      '</div>';
+    }).join('');
+  }
+  var total = cart.reduce(function(s,it){return s+it.p*it.q;},0);
+  document.getElementById('total-val').textContent = EUR(total);
+  document.getElementById('top-total').textContent = EUR(total);
+  var pagar = !cart.length;
+  document.getElementById('btn-pagar').disabled = pagar;
+  document.getElementById('btn-cobrar').disabled = pagar;
+}
+
+// =================== PAGAMENTO ===================
+function abrirPagamento(){
+  if(!cart.length) return;
+  var total = cart.reduce(function(s,it){return s+it.p*it.q;},0);
+  document.getElementById('pag-total').textContent = EUR(total);
+  document.getElementById('modal-pag').style.display = 'block';
+}
+
+function fecharModal(){
+  document.getElementById('modal-pag').style.display = 'none';
+}
+
+function selPag(btn, met){
+  document.querySelectorAll('.pag-opt').forEach(function(b){b.className='pag-opt';});
+  btn.className = 'pag-opt on';
+  pagMetodo = met;
+}
+
+function confirmarPagamento(){
+  document.getElementById('modal-pag').style.display = 'none';
+  // Gerar número de senha
+  if(typeof AndroidFB !== 'undefined'){
+    try{ AndroidFB.proximoNumero(); }catch(e){ usarNumeroLocal(); }
+  } else {
+    usarNumeroLocal();
+  }
+}
+
+function usarNumeroLocal(){
+  numSenha = (numSenha % 999) + 1;
+  mostrarSenha(numSenha);
+}
+
+window.addEventListener('fbNumeroGerado', function(e){
+  var num = parseInt(e.detail||'1');
+  numSenha = num;
+  mostrarSenha(num);
+});
+
+function mostrarSenha(num){
+  var total = cart.reduce(function(s,it){return s+it.p*it.q;},0);
+  document.getElementById('senha-num').textContent = String(num).padStart(3,'0');
+  document.getElementById('senha-total').textContent = EUR(total);
+  document.getElementById('modal-senha').style.display = 'block';
+
+  // Enviar pedido para KDS
+  var itemsJson = JSON.stringify(cart.map(function(it){return {n:it.nome,p:it.p,q:it.q,d:it.d};}));
+  var total = cart.reduce(function(s,it){return s+it.p*it.q;},0);
+  if(typeof AndroidFB !== 'undefined'){
+    try{ AndroidFB.enviarPedido(itemsJson, String(total), String(num), 'todos'); }catch(e){}
+  }
+
+  // Imprimir
+  imprimirTaloes(num, total);
+}
+
+function novoRegisto(){
+  document.getElementById('modal-senha').style.display = 'none';
+  limparCarrinho();
+}
+
+// =================== IMPRESSÃO ===================
+function imprimirTaloes(num, total){
+  if(typeof AndroidPrint === 'undefined') return;
+  try{
+    // Talão 1: Recibo
+    imprimirRecibo(num, total);
+    // Talão 2: Senha (após 500ms)
+    setTimeout(function(){ imprimirSenha(num, total); }, 500);
+  }catch(e){}
+}
+
+function imprimirRecibo(num, total){
+  var esc = buildReciboESC(num, total);
+  if(typeof AndroidPrint !== 'undefined') AndroidPrint.printBytes(esc);
+}
+
+function imprimirSenha(num, total){
+  var esc = buildSenhaESC(num);
+  if(typeof AndroidPrint !== 'undefined') AndroidPrint.printBytes(esc);
+}
+
+function buildReciboESC(num, total){
+  var E=[], ESC=27, GS=29;
+  var enc = function(s){ var b=[]; for(var i=0;i<s.length;i++) b.push(s.charCodeAt(i)&0xFF); return b; };
+  var ln = function(s){ E.push.apply(E,enc(s)); E.push(10); };
+  var sep = function(){ ln('--------------------------------'); };
+  var center = function(){ E.push(ESC,97,1); };
+  var left = function(){ E.push(ESC,97,0); };
+  var bold = function(on){ E.push(ESC,69,on?1:0); };
+  var cut = function(){ E.push(GS,86,0); };
+  var init = function(){ E.push(ESC,64); };
+
+  init();
+  center(); bold(true); ln('CRIATIVO POS'); bold(false);
+  center(); ln('Senha #'+String(num).padStart(3,'0'));
+  center(); ln(new Date().toLocaleDateString('pt-PT')+' '+new Date().toLocaleTimeString('pt-PT').slice(0,5));
+  sep();
+  left();
+  cart.forEach(function(it){
+    var sub = (it.p*it.q).toFixed(2)+'EUR';
+    var nome = it.q+'x '+it.nome;
+    var espaco = 32 - nome.length - sub.length;
+    if(espaco < 1) espaco = 1;
+    ln(nome + Array(espaco+1).join(' ') + sub);
+  });
+  sep();
+  bold(true);
+  var ts = total.toFixed(2)+'EUR';
+  var tl = 'TOTAL';
+  ln(tl + Array(32-tl.length-ts.length+1).join(' ') + ts);
+  bold(false);
+  sep();
+  center(); ln('Obrigado pela sua visita!');
+  E.push(10,10,10);
+  cut();
+  return E;
+}
+
+function buildSenhaESC(num){
+  var E=[], ESC=27, GS=29;
+  var enc = function(s){ var b=[]; for(var i=0;i<s.length;i++) b.push(s.charCodeAt(i)&0xFF); return b; };
+  var ln = function(s){ E.push.apply(E,enc(s)); E.push(10); };
+  var center = function(){ E.push(ESC,97,1); };
+  var bold = function(on){ E.push(ESC,69,on?1:0); };
+  var big = function(on){ E.push(ESC,33,on?0x38:0); };
+  var cut = function(){ E.push(GS,86,0); };
+
+  E.push(ESC,64);
+  center();
+  ln(''); ln('');
+  ln('CRIATIVO POS');
+  ln('');
+  bold(true); ln('A SUA SENHA'); bold(false);
+  ln('');
+  big(true); bold(true);
+  ln('#'+String(num).padStart(3,'0'));
+  big(false); bold(false);
+  ln('');
+  ln('Aguarde ser chamado');
+  ln(''); ln(''); ln('');
+  cut();
+  return E;
+}
+
+// =================== UTILS ===================
+function EUR(v){ return parseFloat(v||0).toFixed(2).replace('.',',')+' \u20AC'; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escJs(s){ return String(s||'').replace(/'/g,"\\'"); }
+
+function abrirConfig(){
+  var r = prompt('Reset contador de senhas? (escreve RESET)');
+  if(r === 'RESET'){
+    if(typeof AndroidFB !== 'undefined') try{ AndroidFB.resetarContador(); }catch(e){}
+    numSenha = 0;
+    alert('Contador resetado');
+  }
+}
+</script>
+</body>
+</html>
