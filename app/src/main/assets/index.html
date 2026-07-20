@@ -150,8 +150,8 @@ var numSenha = 0;
 
 // =================== INICIALIZAÇÃO ===================
 (function(){
-  if(typeof AndroidFB !== 'undefined'){
-    try{ AndroidFB.carregarMenu(); }catch(e){}
+  if(typeof AndroidLocal !== 'undefined'){
+    try{ AndroidLocal.carregarMenu(); }catch(e){}
   } else {
     // Modo demo sem Android
     window.dispatchEvent(new CustomEvent('fbMenuCarregado', {detail: JSON.stringify([
@@ -279,8 +279,8 @@ function selPag(btn, met){
 function confirmarPagamento(){
   document.getElementById('modal-pag').style.display = 'none';
   // Gerar número de senha
-  if(typeof AndroidFB !== 'undefined'){
-    try{ AndroidFB.proximoNumero(); }catch(e){ usarNumeroLocal(); }
+  if(typeof AndroidLocal !== 'undefined'){
+    try{ AndroidLocal.proximoNumero(); }catch(e){ usarNumeroLocal(); }
   } else {
     usarNumeroLocal();
   }
@@ -291,12 +291,6 @@ function usarNumeroLocal(){
   mostrarSenha(numSenha);
 }
 
-window.addEventListener('fbNumeroGerado', function(e){
-  var num = parseInt(e.detail||'1');
-  numSenha = num;
-  mostrarSenha(num);
-});
-
 function mostrarSenha(num){
   var total = cart.reduce(function(s,it){return s+it.p*it.q;},0);
   document.getElementById('senha-num').textContent = String(num).padStart(3,'0');
@@ -306,8 +300,8 @@ function mostrarSenha(num){
   // Enviar pedido para KDS
   var itemsJson = JSON.stringify(cart.map(function(it){return {n:it.nome,p:it.p,q:it.q,d:it.d};}));
   var total = cart.reduce(function(s,it){return s+it.p*it.q;},0);
-  if(typeof AndroidFB !== 'undefined'){
-    try{ AndroidFB.enviarPedido(itemsJson, String(total), String(num), 'todos'); }catch(e){}
+  if(typeof AndroidLocal !== 'undefined'){
+    try{ AndroidLocal.enviarPedido(itemsJson, String(total), String(num), 'todos'); }catch(e){}
   }
 
   // Imprimir
@@ -411,7 +405,7 @@ function escJs(s){ return String(s||'').replace(/'/g,"\\'"); }
 function abrirConfig(){
   var r = prompt('Reset contador de senhas? (escreve RESET)');
   if(r === 'RESET'){
-    if(typeof AndroidFB !== 'undefined') try{ AndroidFB.resetarContador(); }catch(e){}
+    if(typeof AndroidLocal !== 'undefined') try{ AndroidLocal.resetarContador(); }catch(e){}
     numSenha = 0;
     alert('Contador resetado');
   }
