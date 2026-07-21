@@ -150,9 +150,20 @@ var numSenha = 0;
 
 // =================== INICIALIZAÇÃO ===================
 (function(){
-  if(typeof AndroidLocal !== 'undefined'){
-    try{ AndroidLocal.carregarMenu(); }catch(e){}
-  } else {
+  // Carregar menu do ficheiro local menu.json
+  fetch('menu.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      window.dispatchEvent(new CustomEvent('fbMenuCarregado', {detail: JSON.stringify(data)}));
+    })
+    .catch(function(){
+      // Fallback demo
+      window.dispatchEvent(new CustomEvent('fbMenuCarregado', {detail: JSON.stringify([
+        {nome:'Comidas', ordem:1, items:[{nome:'Bifana no Pao',preco:4,destino:'cozinha'}]},
+        {nome:'Bebidas', ordem:2, items:[{nome:'Cerveja',preco:1.5,destino:'bar'}]}
+      ])}));
+    });
+  if(false){
     // Modo demo sem Android
     window.dispatchEvent(new CustomEvent('fbMenuCarregado', {detail: JSON.stringify([
       {id:'c1', nome:'Comidas', ordem:0, items:[
