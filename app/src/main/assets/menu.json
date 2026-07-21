@@ -1,0 +1,44 @@
+[
+  {
+    "nome": "COMIDAS",
+    "ordem": 1,
+    "items": [
+      {"nome": "SANDES LEITAO", "preco": 7.00, "destino": "cozinha"},
+      {"nome": "CALDO VERDE", "preco": 3.00, "destino": "cozinha"},
+      {"nome": "PREGO NO PRATO", "preco": 15.00, "destino": "cozinha"},
+      {"nome": "PREGO NO PAO", "preco": 6.00, "destino": "cozinha"},
+      {"nome": "LEITAO NO PRATO", "preco": 18.00, "destino": "cozinha"},
+      {"nome": "BIFANA NO PAO", "preco": 4.00, "destino": "cozinha"},
+      {"nome": "BIFANA NO PRATO", "preco": 12.50, "destino": "cozinha"},
+      {"nome": "ALHEIRA NO PRATO", "preco": 11.00, "destino": "cozinha"},
+      {"nome": "MOELAS", "preco": 6.00, "destino": "cozinha"},
+      {"nome": "PICA-PAU", "preco": 7.00, "destino": "cozinha"}
+    ]
+  },
+  {
+    "nome": "BEBIDAS",
+    "ordem": 2,
+    "items": [
+      {"nome": "CERVEJA", "preco": 1.50, "destino": "bar"},
+      {"nome": "CERVEJA SEM ALCOOL", "preco": 1.50, "destino": "bar"},
+      {"nome": "AGUA", "preco": 1.00, "destino": "bar"},
+      {"nome": "REFRIGERANTE", "preco": 1.60, "destino": "bar"},
+      {"nome": "CIDRA", "preco": 2.00, "destino": "bar"},
+      {"nome": "COCA COLA", "preco": 1.60, "destino": "bar"},
+      {"nome": "VINHO TINTO (copo)", "preco": 1.50, "destino": "bar"},
+      {"nome": "VINHO VERDE (copo)", "preco": 1.50, "destino": "bar"},
+      {"nome": "CAFE", "preco": 0.80, "destino": "bar"},
+      {"nome": "DESCAFEINADO", "preco": 0.80, "destino": "bar"},
+      {"nome": "SUMO NATURAL", "preco": 2.00, "destino": "bar"}
+    ]
+  },
+  {
+    "nome": "SOBREMESAS",
+    "ordem": 3,
+    "items": [
+      {"nome": "ARROZ DOCE", "preco": 2.00, "destino": "cozinha"},
+      {"nome": "PUDIM", "preco": 2.00, "destino": "cozinha"},
+      {"nome": "BOLO DO DIA", "preco": 2.50, "destino": "cozinha"}
+    ]
+  }
+]
