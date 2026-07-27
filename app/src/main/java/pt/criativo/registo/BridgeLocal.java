@@ -55,6 +55,40 @@ public class BridgeLocal {
         return proximo;
     }
 
+    /** Grava pedido pendente no Firebase (modo B - aguarda activacao) */
+    @JavascriptInterface
+    public void gravarPedidoPendente(String itemsJson, String totalStr, String numero, String mesa) {
+        // Guardar localmente nas SharedPreferences para o Smartphone activar via QR
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
+        try {
+            org.json.JSONObject pedido = new org.json.JSONObject();
+            pedido.put("items",   itemsJson);
+            pedido.put("total",   Double.parseDouble(totalStr));
+            pedido.put("numero",  numero);
+            pedido.put("mesa",    mesa != null ? mesa : "");
+            pedido.put("estado",  "aguarda_activacao");
+            pedido.put("criado",  System.currentTimeMillis());
+            // Guardar indexed por numero
+            prefs.edit().putString("pedido_" + numero, pedido.toString()).apply();
+            // Lista de pendentes
+            String lista = prefs.getString("pedidos_pendentes", "[]");
+            org.json.JSONArray arr = new org.json.JSONArray(lista);
+            arr.put(numero);
+            prefs.edit().putString("pedidos_pendentes", arr.toString()).apply();
+            emitir("fbPedidoPendente", numero);
+            Log.d(TAG, "Pedido pendente guardado: #" + numero);
+        } catch (Exception e) {
+            Log.e(TAG, "gravarPedidoPendente: " + e.getMessage());
+        }
+    }
+
+    /** Activa pedido pendente (chamado pelo Smartphone via QR) */
+    @JavascriptInterface
+    public String buscarPedidoPendente(String numero) {
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
+        return prefs.getString("pedido_" + numero, "");
+    }
+
     /** Reseta o contador de senhas */
     @JavascriptInterface
     public void resetarContador() {
