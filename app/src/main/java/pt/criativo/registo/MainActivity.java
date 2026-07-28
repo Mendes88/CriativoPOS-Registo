@@ -9,12 +9,11 @@ import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.content.SharedPreferences;
 
 public class MainActivity extends Activity {
 
-    private WebView  webView;
-    private BridgeLocal bridge;
+    private WebView        webView;
+    private FirebaseBridge bridge;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -36,7 +35,7 @@ public class MainActivity extends Activity {
         ws.setAllowFileAccessFromFileURLs(true);
         ws.setAllowUniversalAccessFromFileURLs(true);
 
-        bridge = new BridgeLocal(this, webView);
+        bridge = new FirebaseBridge(this, webView);
         webView.addJavascriptInterface(bridge, "AndroidLocal");
 
         webView.setWebViewClient(new WebViewClient());
@@ -64,6 +63,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (bridge != null) bridge.destroy();
         if (webView != null) { webView.removeAllViews(); webView.destroy(); }
     }
 }
