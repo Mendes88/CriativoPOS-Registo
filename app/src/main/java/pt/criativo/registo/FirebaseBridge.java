@@ -76,6 +76,23 @@ public class FirebaseBridge {
             .edit().putInt("contador_senhas", 0).apply();
     }
 
+    /** Carrega menu do ficheiro assets/menu.json */
+    @JavascriptInterface
+    public void carregarMenu() {
+        try {
+            java.io.InputStream is = activity.getAssets().open("menu.json");
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is, "UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            reader.close();
+            emitir("fbMenuCarregado", sb.toString());
+        } catch (Exception e) {
+            Log.e(TAG, "carregarMenu: " + e.getMessage());
+            emitir("fbMenuCarregado", "[]");
+        }
+    }
+
     /** Modo A: Envia pedido directamente para KDS */
     @JavascriptInterface
     public void enviarPedido(String itemsJson, String totalStr, String numero, String destino) {
