@@ -228,9 +228,13 @@ function mostrarModoActual(){
   if(modoGuardado === 'A' || modoGuardado === 'B'){
     MODO = modoGuardado;
     _modoSel = modoGuardado;
+    selModo(modoGuardado);
     mostrarModoActual();
   } else {
-    // Primeira vez - mostrar selector
+    // Primeira vez ou valor invalido - mostrar selector
+    if(typeof AndroidLocal !== 'undefined'){
+      try{ AndroidLocal.gravarPreferencia('modo_registo',''); }catch(e){}
+    }
     document.getElementById('modo-overlay').style.display = 'flex';
   }
   // Carregar menu do ficheiro local menu.json
