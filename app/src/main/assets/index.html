@@ -9,18 +9,6 @@
 :root{--ac:#EF9F27;--bg:#1a1a1a;--sf:#242424;--bd:#2e2e2e;--tx:#f0f0f0;--di:#666;--gn:#4caf50;--rd:#c62828}
 body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
-/* ECRÃ MODO */
-.modo-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
-.modo-box{background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:40px;width:92%;max-width:500px;}
-.modo-titulo{font-size:28px;font-weight:900;color:var(--ac);text-align:center;margin-bottom:8px;}
-.modo-sub{font-size:14px;color:var(--di);text-align:center;margin-bottom:32px;}
-.modo-opt{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
-.modo-btn{padding:18px 20px;border:2px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);cursor:pointer;text-align:left;transition:all .15s;}
-.modo-btn:hover{border-color:var(--ac);}
-.modo-btn.sel{border-color:var(--ac);background:#2a1f0a;}
-.modo-btn-titulo{font-size:16px;font-weight:700;color:var(--tx);}
-.modo-btn-desc{font-size:12px;color:var(--di);margin-top:4px;}
-.modo-confirmar{width:100%;padding:16px;background:var(--ac);border:none;border-radius:12px;color:#111;font-size:16px;font-weight:800;cursor:pointer;}
 /* TOPO */
 .top-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-bottom:1px solid var(--bd);flex-shrink:0}
 .top-logo{font-size:20px;font-weight:800;color:var(--ac);letter-spacing:1px}
@@ -86,25 +74,6 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
 </head>
 <body>
 
-<!-- ECRÃ SELECTOR DE MODO -->
-<div class="modo-overlay" id="modo-overlay" style="display:none;">
-  <div class="modo-box">
-    <div class="modo-titulo">&#127859; Criativo Registo</div>
-    <div class="modo-sub">Selecciona o modo de operação para este evento</div>
-    <div class="modo-opt">
-      <button class="modo-btn sel" id="modo-a" onclick="selModo('A')">
-        <div class="modo-btn-titulo">&#128179; Pré-pagamento Simples</div>
-        <div class="modo-btn-desc">Cliente paga → recebe senha → levanta no balcão</div>
-      </button>
-      <button class="modo-btn" id="modo-b" onclick="selModo('B')">
-        <div class="modo-btn-titulo">&#128269; Pré-pagamento com Entrega</div>
-        <div class="modo-btn-desc">Cliente paga → recebe QR → funcionário activa e entrega na mesa</div>
-      </button>
-    </div>
-    <button class="modo-confirmar" onclick="confirmarModo()">Confirmar</button>
-  </div>
-</div>
-
 <!-- CAMPO MESA (modo B) -->
 <div class="modal-overlay" id="modal-mesa" style="display:none;">
   <div class="modal-box">
@@ -123,7 +92,6 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
 <!-- TOPO -->
 <div class="top-bar">
   <div class="top-logo">&#127859; Criativo Registo</div>
-  <div id="modo-label" style="font-size:11px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:3px 8px;color:var(--di);cursor:pointer;" onclick="document.getElementById('modo-overlay').style.display='flex'">&#128179; Simples</div>
   <div class="top-total" id="top-total">0,00 €</div>
   <button class="btn-top btn-limpar" onclick="limparCarrinho()">&#10005; Limpar</button>
   <button class="btn-top btn-cobrar" onclick="abrirPagamento()" id="btn-cobrar" disabled>Cobrar</button>
@@ -194,49 +162,11 @@ var menu = [];
 var catActual = null;
 var pagMetodo = 'd';
 var numSenha = 0;
-var MODO = 'A'; // A=simples, B=entrega com QR
-var _modoSel = 'A';
-
-// =================== SELECTOR DE MODO ===================
-function selModo(m){
-  _modoSel = m;
-  document.getElementById('modo-a').className = 'modo-btn' + (m==='A'?' sel':'');
-  document.getElementById('modo-b').className = 'modo-btn' + (m==='B'?' sel':'');
-}
-
-function confirmarModo(){
-  MODO = _modoSel;
-  if(typeof AndroidLocal !== 'undefined'){
-    try{ AndroidLocal.gravarPreferencia('modo_registo', MODO); }catch(e){}
-  }
-  document.getElementById('modo-overlay').style.display = 'none';
-  mostrarModoActual();
-}
-
-function mostrarModoActual(){
-  var label = MODO === 'A' ? '&#128179; Simples' : '&#128269; Entrega';
-  document.getElementById('modo-label').innerHTML = label;
-}
+// Modo unico: Pre-pagamento com QR
 
 // =================== INICIALIZAÇÃO ===================
 (function(){
-  // Verificar modo guardado
-  var modoGuardado = '';
-  if(typeof AndroidLocal !== 'undefined'){
-    try{ modoGuardado = AndroidLocal.lerPreferencia('modo_registo'); }catch(e){}
-  }
-  if(modoGuardado === 'A' || modoGuardado === 'B'){
-    MODO = modoGuardado;
-    _modoSel = modoGuardado;
-    selModo(modoGuardado);
-    mostrarModoActual();
-  } else {
-    // Primeira vez ou valor invalido - mostrar selector
-    if(typeof AndroidLocal !== 'undefined'){
-      try{ AndroidLocal.gravarPreferencia('modo_registo',''); }catch(e){}
-    }
-    document.getElementById('modo-overlay').style.display = 'flex';
-  }
+  // Modo pre-pagamento com QR activo por defeito
   // Carregar menu do ficheiro local menu.json
   fetch('menu.json')
     .then(function(r){ return r.json(); })
@@ -360,12 +290,7 @@ function renderCart(){
 // =================== PAGAMENTO ===================
 function abrirPagamento(){
   if(!cart.length) return;
-  if(MODO === 'B'){
-    // Modo entrega - abrir modal de mesa primeiro (opcional)
-    document.getElementById('input-mesa').value = '';
-    document.getElementById('modal-mesa').style.display = 'block';
-    return;
-  }
+  // Pre-pagamento com QR - ir directo para pagamento
   avancarPagamento();
 }
 
@@ -410,19 +335,12 @@ function mostrarSenha(num){
 
   var itemsJson = JSON.stringify(cart.map(function(it){return {n:it.nome,p:it.p,q:it.q,d:it.d};}));
 
-  if(MODO === 'A'){
-    // Modo simples - enviar pedido imediatamente para KDS
-    if(typeof AndroidLocal !== 'undefined'){
-      try{ AndroidLocal.enviarPedido(itemsJson, String(total), String(num), 'todos'); }catch(e){}
-    }
-    imprimirTaloes(num, total, null, false);
-  } else {
-    // Modo B - gravar com estado aguarda_activacao, nao envia para KDS ainda
-    if(typeof AndroidLocal !== 'undefined'){
-      try{ AndroidLocal.gravarPedidoPendente(itemsJson, String(total), String(num), mesa); }catch(e){}
-    }
-    imprimirTaloes(num, total, mesa, true); // true = imprimir QR
+  // Pre-pagamento com QR - gravar no Firebase aguardando activacao
+  if(typeof AndroidLocal !== 'undefined'){
+    try{ AndroidLocal.gravarPedidoPendente(itemsJson, String(total), String(num), mesa); }catch(e){}
   }
+  // Imprimir recibo + talao com QR
+  imprimirTaloes(num, total, mesa, true);
 }
 
 function novoRegisto(){
